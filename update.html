@@ -1,0 +1,27 @@
+name: Update Dashboard
+on:
+  schedule:
+    - cron: '0 18 * * 1-5' # Runs at 18:00 UTC, Mon-Fri
+  workflow_dispatch: # Allows you to run it manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install pandas plotly
+      - name: Run update script
+        run: python update_dashboard.py
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add unified_portfolio.html
+          git commit -m "Auto-update portfolio dashboard"
+          git push
