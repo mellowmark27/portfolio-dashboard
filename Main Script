@@ -1,0 +1,69 @@
+import yfinance as yf
+import pandas as pd
+from datetime import datetime
+import json
+
+# Your portfolio symbols
+PORTFOLIO = {
+    'FOUR.L': {'name': '4imprint Group PLC', 'currency': 'GBX'},
+    'ABDN.L': {'name': 'Aberdeen Group PLC', 'currency': 'GBX'},
+    'ADIG.L': {'name': 'Abrdn Diversified Income & Growth plc', 'currency': 'GBX'},
+    'AEWU.L': {'name': 'AEW UK REIT Ord', 'currency': 'GBX'},
+    'ANIC.L': {'name': 'Agronomics Ltd', 'currency': 'GBX'},
+    'AIBG.L': {'name': 'AIB Group PLC', 'currency': 'GBX'},
+    'ALT.L': {'name': 'Altitude Group PLC', 'currency': 'GBX'},
+    'APLE': {'name': 'Apple Hospitality REIT Inc', 'currency': 'USD'},
+    'AERS.L': {'name': 'Aquila European Renewables PLC', 'currency': 'GBX'},
+    'ARCC': {'name': 'Ares Capital Corp', 'currency': 'USD'},
+    # Add all your stocks here
+}
+
+def fetch_stock_data(symbol):
+    """Fetch stock data from yfinance"""
+    try:
+        ticker = yf.Ticker(symbol)
+        data = ticker.history(period='1d')
+        info = ticker.info
+        
+        return {
+            'symbol': symbol,
+            'price': data['Close'].iloc[-1] if len(data) > 0 else 0,
+            'volume': int(data['Volume'].iloc[-1]) if len(data) > 0 else 0,
+            'change_pct': info.get('regularMarketChangePercent', 0) if info else 0,
+        }
+    except Exception as e:
+        print(f"Error fetching {symbol}: {e}")
+        return None
+
+def update_portfolio_data():
+    """Update portfolio with latest prices"""
+    portfolio_data = []
+    
+    for symbol, details in PORTFOLIO.items():
+        print(f"Fetching {symbol}...")
+        stock_data = fetch_stock_data(symbol)
+        
+        if stock_data:
+            portfolio_data.append({
+                'Name': details['name'],
+                'Symbol': symbol,
+                'Last Price': round(stock_data['price'], 2),
+                'Currency': details['currency'],
+                'Daily Change %': round(stock_data['change_pct'], 2),
+                'Volume': stock_data['volume'],
+                'Updated': datetime.now().isoformat()
+            })
+    
+    # Save as CSV
+    df = pd.DataFrame(portfolio_data)
+    df.to_csv('portfolio_data.csv', index=False)
+    
+    # Save as JSON
+    with open('portfolio_data.json', 'w') as f:
+        json.dump(portfolio_data, f, indent=2)
+    
+    print(f"✅ Updated {len(portfolio_data)} stocks")
+    return portfolio_data
+
+if __name__ == '__main__':
+    update_portfolio_data()
