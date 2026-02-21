@@ -1,0 +1,38 @@
+# Portfolio Dashboard
+
+Automatic portfolio tracking with daily price updates via GitHub Actions.
+
+## Setup
+
+1. **Add files to your repo:**
+   - `.github/workflows/update-portfolio.yml`
+   - `requirements.txt`
+   - `update_portfolio.py`
+   - `index.html`
+
+2. **Enable GitHub Pages:**
+   - Go to Settings → Pages
+   - Set source to `main` branch
+   - Your dashboard will be live at: `https://mellowmark27.github.io/portfolio-dashboard`
+
+3. **Update your stocks in `update_portfolio.py`:**
+   - Replace the PORTFOLIO dict with your stocks
+   - Use Yahoo Finance symbols (e.g., `FOUR.L` for LSE stocks)
+
+4. **Workflow runs automatically:**
+   - Every weekday at 5:30 PM UTC
+   - Updates `portfolio_data.json` and `portfolio_data.csv`
+   - Commits changes automatically
+
+## Yahoo Finance Symbols
+
+- LSE stocks: Add `.L` suffix (e.g., `FOUR.L`)
+- NYSE: No suffix (e.g., `AAPL`)
+- NASDAQ: No suffix (e.g., `MSFT`)
+
+## Manual Trigger
+
+To test the workflow:
+1. Go to repo → Actions
+2. Select "Update Portfolio Daily"
+3. Click "Run workflow"
